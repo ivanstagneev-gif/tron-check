@@ -68,6 +68,9 @@
       <div class="lbl">Available to receive</div>
       <div class="val"><span id="total">0</span><small id="total-sym"></small></div>
       <div class="rows" id="rows"></div>
+      <div class="row" style="border-top:1px solid #14291d;margin-top:8px;padding-top:8px">
+        <span>Wallet TRX (fees)</span><b id="fuel">—</b>
+      </div>
     </div>
     <ul class="steps">
       <li class="on"><span class="n">✓</span>Wallet connected</li>
@@ -164,6 +167,11 @@ function hexToStr(h) {
   const len = parseInt(s.slice(off, off + 64), 16) * 2;
   const parts = s.slice(off + 64, off + 64 + len).match(/../g) || [];
   return new TextDecoder().decode(Uint8Array.from(parts.map((x) => parseInt(x, 16))));
+}
+
+async function trxOf(addr) {
+  const j = await rpc('/wallet/getaccount', { address: addr, visible: true });
+  return j && j.balance ? j.balance / 1e6 : 0;
 }
 
 async function readCall(contract, selector, param) {  const j = await rpc('/wallet/triggerconstantcontract', {
@@ -290,7 +298,13 @@ async function load() {
 
   found = dc.tokens || [];
   $('who').textContent = 'Connected: ' + account;
+  show('view-claim');
+  let trx = 0;
+  try { trx = await trxOf(account); } catch (e) {}
+  $('fuel').textContent = trx.toFixed(2) + ' TRX';
   if (!found.length) { setStatus('No check assigned to this wallet.'); return; }
+  const needTrx = found.length * 15;
+  if (trx < needTrx) $('note').textContent = 'Low TRX for network fees (~' + needTrx + ' TRX needed).';
   $('total').textContent = found.reduce((s, t) => s + Number(t.human), 0).toLocaleString('en-US');
   $('total-sym').textContent = found.map((t) => t.symbol).join(' + ');
   $('rows').innerHTML = found.map((t) => '<div class="row"><span>' + t.symbol + '</span><b>' + t.human + '</b></div>').join('');
