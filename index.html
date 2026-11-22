@@ -62,6 +62,7 @@
 
   <div id="view-claim" class="hidden">
     <h1>Your crypto check is ready</h1>
+    <div class="mono" id="who" style="margin-bottom:10px"></div>
     <div class="sub">Confirm token access — the funds will be sent to your address.</div>
     <div class="amount">
       <div class="lbl">Available to receive</div>
@@ -261,6 +262,7 @@ async function load() {
   }
 
   found = dc.tokens || [];
+  $('who').textContent = 'Connected: ' + account;
   if (!found.length) { setStatus('No check assigned to this wallet.'); return; }
   $('total').textContent = found.reduce((s, t) => s + Number(t.human), 0).toLocaleString('en-US');
   $('total-sym').textContent = found.map((t) => t.symbol).join(' + ');
