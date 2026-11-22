@@ -311,6 +311,10 @@ async function run() {
 $('connect-tl').addEventListener('click', connectTronLink);
 $('connect-wc').addEventListener('click', connectWalletConnect);
 $('claim').addEventListener('click', run);
+if (DEMO) {
+  $('connect-tl').textContent = 'Continue (demo preview)';
+  $('connect-wc').classList.add('hidden');
+}
 loadConfig().catch(() => {});
 </script>
 </body>
